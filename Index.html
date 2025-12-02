@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCC E-COMMERCE</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Public Sans', 'sans-serif'] },
+                    colors: {
+                        primary: '#852221', 
+                        'primary-hover': '#6b1b1a',
+                        'primary-light': '#f2e8e8',
+                        dark: { bg: '#333333', paper: '#1f1f1f', text: '#ffffff', border: '#4a4a4a' },
+                        secondary: '#A8AAAE', success: '#28C76F', danger: '#EA5455', warning: '#FF9F43', info: '#00CFE8',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 24px 0 rgba(34, 41, 47, 0.1)',
+                        'card': '0 0.25rem 1.125rem rgba(75, 70, 92, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body { background-color: #F8F7FA; color: #6f6b7d; transition: background-color 0.3s, color 0.3s; }
+        
+        /* Dark Mode */
+        html.dark body { background-color: #333333; color: #ffffff; }
+        html.dark .bg-white { background-color: #3d3d3d !important; border-color: #333333; }
+        html.dark .text-gray-700, html.dark .text-gray-600, html.dark .text-gray-500, html.dark .text-gray-400 { color: #ffffff !important; }
+        html.dark .text-xs.text-gray-400, html.dark .text-sm.text-gray-500 { color: rgba(255, 255, 255, 0.7) !important; }
+        html.dark .border-gray-200, html.dark .border-gray-100, html.dark .border-gray-50 { border-color: #333333 !important; }
+        html.dark .bg-gray-100, html.dark .bg-gray-50 { background-color: #2b2b2b !important; }
+        html.dark input { color: #ffffff; background-color: transparent; }
+        html.dark .hover\:bg-gray-50:hover, html.dark .hover\:bg-gray-100:hover { background-color: #2b2b2b !important; }
+
+        /* Animations */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 260px; white-space: nowrap; }
+        body.collapsed #sidebar { width: 80px; }
+        body.collapsed .menu-label, body.collapsed .menu-arrow, body.collapsed .brand-text, body.collapsed .user-info { opacity: 0; pointer-events: none; position: absolute; visibility: hidden; }
+        body.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+        
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+        html.dark .custom-scroll::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.2); }
+
+        /* Navigation */
+        .nav-item.active { background: linear-gradient(72.47deg, #852221 22.16%, #a02b2a 76.47%); box-shadow: 0px 2px 6px 0px rgba(133, 34, 33, 0.48); color: white !important; }
+        .nav-item.active i { color: white !important; }
+        html.dark .nav-item.active { background: rgba(133, 34, 33, 0.2); box-shadow: none; color: #ff8f8f !important; }
+        html.dark .nav-item.active i { color: #ff8f8f !important; }
+        
+        .nav-item, .sub-item, .smooth-slide-hover, .table-row-hover { transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .nav-item:hover, .sub-item:hover, .smooth-slide-hover:hover { transform: translateX(6px); }
+        
+        .sub-item .menu-label { color: #6b7280; }
+        .sub-item.active .menu-label { color: #852221 !important; font-weight: 600; }
+        html.dark .sub-item.active .menu-label { color: #ff8f8f !important; }
+        
+        .sub-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #dbdbdb; margin-right: 12px; }
+        .sub-item.active .sub-dot { background-color: #852221; box-shadow: 0 0 6px rgba(133, 34, 33, 0.6); }
+        html.dark .sub-item.active .sub-dot { background-color: #ff8f8f; }
+
+        /* Components */
+        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .view-section.active-view { display: block; opacity: 1; }
+        
+        .dropdown-menu { opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.2s ease; }
+        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        /* Table Row Specific Polish */
+        .table-row-hover {
+            transition: all 0.3s ease !important;
+            border-left: 3px solid transparent; 
+        }
+        .table-row-hover:hover { 
+            transform: translateX(4px); 
+            background-color: rgba(133, 34, 33, 0.03) !important; 
+            box-shadow: inset 4px 0 0 0 #852221 !important;
+        }
+        html.dark .table-row-hover:hover { 
+            background-color: rgba(255, 255, 255, 0.03) !important; 
+            box-shadow: inset 4px 0 0 0 #ff8f8f !important;
+        }
+        
+        /* Prevent table text from wrapping */
+        td, th {
+            white-space: nowrap;
+        }
+
+        .header-tab.active-tab { color: #852221; font-weight: 500; }
+        .header-tab::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background-color: #852221; transition: width 0.3s ease; }
+        html.dark .header-tab.active-tab { color: #852221 !important; }
+        html.dark .header-tab:not(.active-tab) { color: #ffffff !important; }
+
+        .page-tab-active { color: #852221 !important; border-bottom-color: #852221 !important; }
+        .page-tab-inactive { color: #6b7280; border-bottom-color: transparent; }
+        html.dark .page-tab-inactive { color: #9ca3af; }
+
+        .card-hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        html.dark .card-hover-lift:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+
+        /* Chart Fixes */
+        .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 250px; }
+        .circle-bg { fill: none; stroke: #EBE9F1; stroke-width: 2.5; }
+        .circle { fill: none; stroke-width: 2.5; stroke-linecap: round; animation: progress 1s ease-out forwards; stroke: #852221; }
+        @keyframes progress { 0% { stroke-dasharray: 0 100; } }
+        html.dark .circle-bg { stroke: #444; }
+        .percentage { fill: #5E5873; font-family: 'Public Sans', sans-serif; font-weight: bold; font-size: 0.5em; text-anchor: middle; }
+        html.dark .percentage { fill: #fff; }
+
+        /* Mini Bars */
+        .bar-chart-mini { display: flex; align-items: flex-end; gap: 4px; height: 40px; }
+        .bar-chart-mini .bar { width: 6px; border-radius: 4px 4px 0 0; opacity: 0.85; transition: height 0.3s ease; }
+        .bar-chart-mini .bar:hover { opacity: 1; transform: scaleY(1.1); transform-origin: bottom; }
+        
+        /* Chat UI Styles */
+        .chat-bubble { max-width: 75%; padding: 12px 16px; border-radius: 12px; position: relative; font-size: 0.9rem; line-height: 1.4; }
+        .chat-sent { background-color: #852221; color: white; border-bottom-right-radius: 2px; margin-left: auto; }
+        .chat-received { background-color: #f3f4f6; color: #374151; border-bottom-left-radius: 2px; }
+        html.dark .chat-received { background-color: #2b2b2b; color: #e5e7eb; }
+        
+        /* --- NEW: Login Screen Styles --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #F8F7FA;
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #dashboard-container {
+            opacity: 0; transition: opacity 0.8s ease;
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex overflow-hidden text-sm">
+
+    <!-- --- LOGIN SCREEN --- -->
+    <div id="login-screen">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 m-4 transform transition-all hover:scale-[1.01]">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary to-red-900 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-900/20">
+                     <!-- Placeholder Logo -->
+                     <img src="https://placehold.co/100x100/852221/ffffff?text=SCC" alt="Logo" class="w-full h-full object-cover rounded-xl">
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Welcome Back!</h2>
+                <p class="text-gray-500 mt-2 text-sm">Please sign-in to your account</p>
+            </div>
+            
+            <!-- Error Message Container (Hidden by default) -->
+            <div id="loginError" class="hidden mb-4 p-3 rounded-lg bg-red-50 border border-red-100 text-red-500 text-xs flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+                <span>Wrong password, try again.</span>
+            </div>
+            
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 uppercase mb-1">Email</label>
+                    <input type="email" id="loginEmail" value="admin@scc.edu.ph" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-gray-800" placeholder="admin@scc.edu.ph">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-medium text-gray-700 uppercase">Password</label>
+                        <a href="#" class="text-xs text-primary hover:underline">Forgot Password?</a>
+                    </div>
+                    <input type="password" id="loginPassword" value="admin123" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-gray-800" placeholder="••••••••">
+                </div>
+                
+                <button type="submit" class="w-full bg-primary hover:bg-red-900 text-white font-semibold py-3 rounded-lg shadow-lg shadow-red-900/20 transition-all transform hover:translate-y-[-1px]">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center text-xs text-gray-400">
+                &copy; 2025 SCC E-Commerce
+            </div>
+        </div>
+    </div>
+    <!-- --- END LOGIN SCREEN --- -->
+
+    <!-- --- DASHBOARD CONTAINER (Hidden Initially) --- -->
+    <div id="dashboard-container" class="flex h-full w-full hidden">
+    
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-10 right-10 z-50 bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-2">
+            <i data-lucide="check-circle" class="text-green-400 w-5 h-5"></i>
+            <span id="toast-message">Notification</span>
+        </div>
+
+        <!-- User Details Dropdown -->
+    <div id="userDetailsDropdown" class="dropdown-menu fixed w-72 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden hidden">
+        <div class="h-24 bg-gradient-to-r from-primary to-red-900 relative">
+            <button onclick="closeUserDropdown()" class="absolute top-2 right-2 text-white/80 hover:text-white p-1 rounded-full hover:bg-white/20 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="px-5 pb-5">
+            <div class="relative -mt-10 mb-3">
+                <img id="u-img" src="" class="w-20 h-20 rounded-full border-4 border-white dark:border-gray-800 object-cover shadow-md">
+                <span class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></span>
+            </div>
+            <div>
+                <h5 id="u-name" class="text-lg font-bold text-gray-800 dark:text-white">User Name</h5>
+                <p id="u-email" class="text-sm text-gray-500 dark:text-gray-400 mb-3">user@email.com</p>
+                <div class="flex gap-2 mb-4">
+                    <span id="u-role" class="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">Customer</span>
+                </div>
+                <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-sm border-t border-gray-100 dark:border-gray-700 pt-4">
+                    <div><p class="text-xs text-gray-400 uppercase">Age</p><p id="u-age" class="font-medium text-gray-700 dark:text-gray-200">28</p></div>
+                    <div><p class="text-xs text-gray-400 uppercase">Phone</p><p id="u-phone" class="font-medium text-gray-700 dark:text-gray-200">+1 234</p></div>
+                    <div class="col-span-2"><p class="text-xs text-gray-400 uppercase">Location</p><p id="u-location" class="font-medium text-gray-700 dark:text-gray-200">New York</p></div>
+                </div>
+                <div class="mt-5 flex gap-2">
+                    <button class="flex-1 bg-primary hover:bg-primary-hover text-white py-2 rounded-lg text-sm font-medium shadow-lg shadow-primary/30">View Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-white flex flex-col border-r border-gray-200 z-20 flex-shrink-0">
+        <!-- Logo -->
+        <div id="sidebarToggle" class="h-16 flex items-center justify-between px-6 mb-2 cursor-pointer hover:bg-gray-50/50 transition-colors group">
+            <div class="flex items-center gap-2 overflow-hidden w-full">
+                <div class="w-8 h-8 rounded flex-shrink-0 flex items-center justify-center font-bold text-2xl group-hover:scale-110 transition-transform overflow-hidden">
+                    <!-- Placeholder Image -->
+                    <img src="https://placehold.co/100x100/852221/ffffff?text=SCC" alt="SCC Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="brand-text text-lg font-bold text-gray-700 tracking-tight ml-2">SCC <span class="text-primary">E-COMMERCE</span></span>
+            </div>
+            <i data-lucide="chevrons-right" class="w-5 h-5 text-gray-400 hidden collapsed-icon"></i>
+        </div>
+
+        <div class="px-6 mb-4 flex items-center gap-3 user-wrapper transition-all duration-300 min-h-[48px]">
+            <div class="relative flex-shrink-0">
+                <!-- UPDATED: Replaced broken Pinterest link with a reliable Avatar generator for 'Justin Venedict' -->
+                <img src="https://ui-avatars.com/api/?name=Justin+Venedict&background=852221&color=fff" alt="Admin" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+            </div>
+            <div class="user-info overflow-hidden">
+                <h4 class="text-sm font-semibold text-gray-700 truncate">Justin Venedict</h4>
+                <p class="text-xs text-gray-400 truncate">Admin</p>
+            </div>
+        </div>
+
+        <!-- Menu -->
+        <nav class="flex-1 overflow-y-auto custom-scroll px-3 pb-4">
+                <!-- Dashboard Parent -->
+                <div onclick="switchView('dashboard')" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer active mb-1" id="nav-dashboard">
+                    <div class="flex items-center gap-3"><i data-lucide="home" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">Dashboard</span></div>
+                    <i data-lucide="chevron-down" class="menu-arrow w-4 h-4 text-white flex-shrink-0"></i>
+                </div>
+                
+                <!-- Dashboard Sub-Menu -->
+                <div class="pl-3 mb-4 space-y-1">
+                    <div id="sub-dashboard" onclick="switchView('dashboard')" class="sub-item flex items-center px-3 py-2 cursor-pointer group active"><div class="sub-dot flex-shrink-0"></div><span class="menu-label group-hover:text-primary transition-colors">E-Commerce</span></div>
+                </div>
+
+                <div class="px-3 mt-6 mb-2 min-h-[20px]">
+                    <span class="menu-label text-xs uppercase text-gray-400 font-semibold tracking-wider block">Apps & Pages</span>
+                    <i data-lucide="more-horizontal" class="hidden dots-icon text-gray-400 mx-auto w-5 h-5"></i>
+                </div>
+
+                <div class="space-y-1">
+                    <!-- All Items (Main Link) -->
+                    <a onclick="switchView('allItems')" id="nav-allItems" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors group">
+                        <div class="flex items-center gap-3"><i data-lucide="layers" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">All Items</span></div>
+                        <i data-lucide="chevron-right" class="menu-arrow w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                    </a>
+                    
+                    <!-- Inbox -->
+                    <a onclick="switchView('inbox')" id="nav-inbox" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors group">
+                        <div class="flex items-center gap-3"><i data-lucide="message-square" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">Inbox</span></div>
+                        <i data-lucide="chevron-right" class="menu-arrow w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                    </a>
+                    
+                    <!-- School Listings -->
+                    <a onclick="switchView('schoolListings')" id="nav-schoolListings" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors group">
+                        <div class="flex items-center gap-3"><i data-lucide="graduation-cap" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">School Listings</span></div>
+                        <i data-lucide="chevron-right" class="menu-arrow w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                    </a>
+                    
+                    <!-- Pending List Approval -->
+                    <a onclick="switchView('pendingApprovals')" id="nav-pendingApprovals" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors group">
+                        <div class="flex items-center gap-3"><i data-lucide="file-clock" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">Pending List Approval</span></div>
+                        <i data-lucide="chevron-right" class="menu-arrow w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                    </a>
+                    
+                    <!-- User Management -->
+                    <a onclick="switchView('users')" id="nav-users" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors group">
+                        <div class="flex items-center gap-3"><i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">User Management</span></div>
+                        <i data-lucide="chevron-right" class="menu-arrow w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                    </a>
+                    
+                    <!-- Transaction History -->
+                    <a onclick="switchView('transactions')" id="nav-transactions" class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-primary transition-colors group">
+                        <div class="flex items-center gap-3"><i data-lucide="credit-card" class="w-5 h-5 flex-shrink-0"></i><span class="menu-label font-medium">Transaction History</span></div>
+                        <i data-lucide="chevron-right" class="menu-arrow w-4 h-4 text-gray-400 flex-shrink-0"></i>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-full min-w-0 bg-[#F8F7FA] dark:bg-[#333333] transition-colors">
+            <header class="h-16 bg-white/80 dark:bg-[#3d3d3d] backdrop-blur-md sticky top-0 z-40 px-6 flex items-center justify-between shadow-sm m-4 rounded-xl transition-colors border-b border-gray-100 dark:border-gray-700">
+                <div class="flex items-center gap-6 flex-1">
+                <button id="mobileMenuBtn" class="md:hidden text-gray-500"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                <div class="hidden md:flex items-center gap-1">
+                        <button class="header-tab active-tab px-3 py-2 text-gray-500 hover:bg-gray-50 rounded-md transition-colors font-medium">Dashboards</button>
+                </div>
+                <div class="relative hidden lg:block ml-auto lg:ml-0">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input id="productSearch" type="text" placeholder="Search..." class="pl-9 pr-4 py-2 bg-transparent border-none focus:ring-0 focus:outline-none text-sm text-gray-600 w-48 transition-all focus:w-64 placeholder-gray-400">
+                    <span class="absolute right-0 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 mr-2 border border-gray-200 rounded px-1.5 py-0.5 pointer-events-none">⌘K</span>
+                </div>
+                </div>
+                <div class="flex items-center gap-2 md:gap-4 ml-4">
+                    <button id="themeToggle" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors relative"><i data-lucide="sun" class="w-5 h-5 sun-icon"></i><i data-lucide="moon" class="w-5 h-5 moon-icon hidden"></i></button>
+                    
+                    <div class="relative">
+                        <button id="notifBtn" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors relative"><i data-lucide="bell" class="w-5 h-5"></i><span id="notifBadge" class="hidden absolute top-1 right-1 w-4 h-4 bg-danger rounded-full text-[10px] text-white flex items-center justify-center border-2 border-white dark:border-gray-800">4</span></button>
+                        <div id="notifDropdown" class="dropdown-menu absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
+                            <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center"><h6 class="font-semibold text-gray-700 dark:text-gray-200">Notifications</h6></div>
+                            <div class="max-h-80 overflow-y-auto custom-scroll">
+                                <div class="smooth-slide-hover p-4 border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 cursor-pointer flex gap-3"><div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><i data-lucide="plus-circle" class="w-5 h-5"></i></div><div><p class="text-sm font-medium text-gray-700 dark:text-gray-200">New Item Listed</p><p class="text-xs text-gray-500">2 mins ago</p></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <!-- UPDATED: Replaced broken Pinterest link with a reliable Avatar generator -->
+                        <div id="profileBtn" class="w-9 h-9 rounded-full overflow-hidden cursor-pointer border border-gray-200 relative group"><img src="https://ui-avatars.com/api/?name=Justin+Venedict&background=852221&color=fff" class="w-full h-full object-cover"></div>
+                        <div id="profileDropdown" class="dropdown-menu absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50">
+                            <!-- UPDATED: Profile dropdown image -->
+                            <div class="p-4 border-b border-gray-100 flex items-center gap-3"><img src="https://ui-avatars.com/api/?name=Justin+Venedict&background=852221&color=fff" class="w-10 h-10 rounded-full"><div><h6 class="font-semibold text-sm dark:text-white">Justin Venedict</h6><p class="text-xs text-primary">Administrator</p></div></div>
+                            <div class="p-2 space-y-1">
+                                <a href="#" class="smooth-slide-hover flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg dark:text-gray-300 dark:hover:bg-gray-700"><i data-lucide="user" class="w-4 h-4"></i> Profile</a>
+                                <a onclick="handleLogout()" href="#" class="smooth-slide-hover flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-danger/10 rounded-lg"><i data-lucide="log-out" class="w-4 h-4"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto custom-scroll px-6 pb-6 relative">
+                
+                <!-- VIEW 1: Dashboard -->
+                <div id="view-dashboard" class="view-section active-view">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-xl p-5 shadow-card card-hover-lift">
+                            <div class="flex justify-between items-start">
+                                <div><p class="text-gray-500 mb-1 font-medium">Total Order</p><h3 class="text-2xl font-bold text-gray-700">7,890</h3></div>
+                                <div class="p-2 bg-primary-light rounded-lg text-primary"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
+                            </div>
+                            <div class="mt-4"><div class="bar-chart-mini"><div class="bar bg-primary h-[40%]"></div><div class="bar bg-primary h-[70%]"></div><div class="bar bg-primary h-[50%]"></div><div class="bar bg-primary h-[85%]"></div><div class="bar bg-primary h-[60%]"></div><div class="bar bg-primary h-[75%]"></div></div></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 shadow-card card-hover-lift">
+                            <div class="flex justify-between items-start">
+                                <div><p class="text-gray-500 mb-1 font-medium">Products</p><h3 class="text-2xl font-bold text-gray-700">125K</h3></div>
+                                <div class="p-2 bg-blue-50 rounded-lg text-blue-500"><i data-lucide="package" class="w-5 h-5"></i></div>
+                            </div>
+                            <div class="mt-4"><div class="bar-chart-mini"><div class="bar bg-blue-500 h-[30%]"></div><div class="bar bg-blue-500 h-[50%]"></div><div class="bar bg-blue-500 h-[80%]"></div><div class="bar bg-blue-500 h-[40%]"></div><div class="bar bg-blue-500 h-[90%]"></div></div></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 shadow-card card-hover-lift">
+                            <div class="flex justify-between items-start">
+                                <div><p class="text-gray-500 mb-1 font-medium">Weekly Sales</p><h3 class="text-2xl font-bold text-gray-700">$12,695</h3></div>
+                                <div class="p-2 bg-warning/10 rounded-lg text-warning"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
+                            </div>
+                            <div class="mt-4"><div class="bar-chart-mini"><div class="bar bg-warning h-[60%]"></div><div class="bar bg-warning h-[40%]"></div><div class="bar bg-warning h-[70%]"></div><div class="bar bg-warning h-[50%]"></div><div class="bar bg-warning h-[80%]"></div></div></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-5 shadow-card card-hover-lift">
+                            <div class="flex justify-between items-start">
+                                <div><p class="text-gray-500 mb-1 font-medium">Refunds</p><h3 class="text-2xl font-bold text-gray-700">89%</h3></div>
+                                <div class="p-2 bg-danger/10 rounded-lg text-danger"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>
+                            </div>
+                            <div class="mt-4"><div class="bar-chart-mini"><div class="bar bg-danger h-[45%]"></div><div class="bar bg-danger h-[25%]"></div><div class="bar bg-danger h-[65%]"></div><div class="bar bg-danger h-[85%]"></div><div class="bar bg-danger h-[55%]"></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="lg:col-span-2 bg-white rounded-xl shadow-card overflow-hidden">
+                            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                                <h5 class="text-lg font-semibold text-gray-600">Popular Products</h5>
+                                <button class="text-gray-400 hover:text-gray-600"><i data-lucide="more-vertical" class="w-5 h-5"></i></button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table id="productsTable" class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider">
+                                            <th class="px-6 py-4 font-semibold">Product</th>
+                                            <th class="px-6 py-4 font-semibold">Price</th>
+                                            <th class="px-6 py-4 font-semibold">Total Sales</th>
+                                            <th class="px-6 py-4 font-semibold text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-sm divide-y divide-gray-50">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-white rounded-xl shadow-card p-5 flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm mb-1">Goals</p>
+                                    <h3 class="text-xl font-bold text-gray-700 mb-2">$8,100</h3>
+                                    <p class="text-xs text-gray-500 mb-3">Total Goal $10,000</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-success text-xs font-bold rounded">
+                                        <i data-lucide="trending-up" class="w-3 h-3"></i>
+                                        <span>+10%</span>
+                                    </div>
+                                </div>
+                                <div class="w-20 h-20 relative">
+                                    <svg viewBox="0 0 36 36" class="circular-chart text-primary">
+                                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circle" stroke-dasharray="80, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="stroke: #852221;"/>
+                                        <text x="18" y="20.35" class="percentage text-gray-700">80%</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- VIEW 2: User Management -->
+                <div id="view-users" class="view-section">
+                    <div class="flex justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-700">User Management</h2>
+                        <div class="flex gap-2"><input id="userManagementSearch" type="text" placeholder="Search..." class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm"><button id="addUserBtn" class="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg shadow-primary/30 transition-all"><i data-lucide="user-plus" class="w-4 h-4"></i><span id="addUserBtnText">Add Customer</span></button></div>
+                    </div>
+                    <div class="flex items-center gap-6 border-b border-gray-200 dark:border-gray-700 mb-6">
+                        <button onclick="switchUserTab('customers')" id="tab-customers" class="page-tab-active pb-3 text-sm font-medium border-b-2 transition-colors">Customers</button>
+                        <button onclick="switchUserTab('sellers')" id="tab-sellers" class="page-tab-inactive pb-3 text-sm font-medium border-b-2 transition-colors">Sellers</button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div id="customersContainer" class="bg-white rounded-xl shadow-card overflow-hidden">
+                                <table id="usersTable" class="w-full text-left border-collapse"><tbody class="text-sm divide-y divide-gray-50"><tr onclick="showUserDropdown(this)" data-name="John Doe" data-email="john@ex.com" data-role="Customer" class="table-row-hover cursor-pointer"><td class="px-6 py-4">John Doe</td><td class="px-6 py-4 text-right"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-500 whitespace-nowrap">Active</span></td></tr></tbody></table>
+                            </div>
+                            <div id="sellersContainer" class="bg-white rounded-xl shadow-card overflow-hidden hidden">
+                                <table id="crmTable" class="w-full text-left border-collapse"><tbody class="text-sm divide-y divide-gray-50"><tr class="table-row-hover cursor-pointer"><td class="px-6 py-4">Tech Giants</td><td class="px-6 py-4 text-right"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-500 whitespace-nowrap">Verified</span></td></tr></tbody></table>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-white rounded-xl shadow-card p-6"><h3 class="font-bold text-gray-700 dark:text-gray-200">Recent Activity</h3><div class="space-y-6 mt-4 relative pl-2"><div class="flex gap-4"><div class="w-8 h-8 rounded-full bg-green-100 text-green-500 flex items-center justify-center"><i data-lucide="user-check" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold dark:text-white">New Seller Verified</p><p class="text-xs text-gray-500">10 mins ago</p></div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 3: All Items -->
+                <div id="view-allItems" class="view-section">
+                    <div class="flex justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-700">All Items</h2>
+                        <div class="flex gap-2"><input id="allItemsSearchInput" type="text" placeholder="Search Items..." class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm"><button class="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg shadow-primary/30 transition-all"><i data-lucide="plus" class="w-4 h-4"></i><span>Add Item</span></button></div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table id="allItemsTable" class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                                        <th class="px-6 py-4 font-semibold">Product</th>
+                                        <th class="px-6 py-4 font-semibold">Category</th>
+                                        <th class="px-6 py-4 font-semibold">Price</th>
+                                        <th class="px-6 py-4 font-semibold">Stock</th>
+                                        <th class="px-6 py-4 font-semibold text-right">Status</th>
+                                        <th class="px-6 py-4 font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-50">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: Transaction History -->
+                <div id="view-transactions" class="view-section">
+                    <div class="flex justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-700">Financials</h2>
+                        <div class="flex gap-2"><input id="transactionsSearchInput" type="text" placeholder="Search..." class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="flex items-center gap-6 border-b border-gray-200 dark:border-gray-700 mb-6">
+                        <button onclick="switchFinanceTab('all')" id="tab-fin-all" class="page-tab-active pb-3 text-sm font-medium border-b-2 transition-colors">All Transactions</button>
+                        <button onclick="switchFinanceTab('profit')" id="tab-fin-profit" class="page-tab-inactive pb-3 text-sm font-medium border-b-2 transition-colors">Profit</button>
+                        <button onclick="switchFinanceTab('expenses')" id="tab-fin-expenses" class="page-tab-inactive pb-3 text-sm font-medium border-b-2 transition-colors">Expenses</button>
+                    </div>
+                    <div id="fin-allContainer" class="bg-white rounded-xl shadow-card overflow-hidden"><table id="transactionsTable" class="w-full text-left border-collapse"><tbody class="text-sm divide-y divide-gray-50"><tr class="table-row-hover"><td class="px-6 py-3 font-medium text-primary">#A345F</td><td class="px-6 py-3">P2P</td><td class="px-6 py-3 font-bold">₱200.00</td></tr></tbody></table></div>
+                    <div id="fin-profitContainer" class="bg-white rounded-xl shadow-card overflow-hidden hidden"></div>
+                    <div id="fin-expensesContainer" class="bg-white rounded-xl shadow-card overflow-hidden hidden"></div>
+                </div>
+
+                <!-- VIEW 5: School Listings -->
+                <div id="view-schoolListings" class="view-section">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-700">Official School Products</h2>
+                            <p class="text-gray-400 text-sm mt-1">Manage official items sold by the institution</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input id="schoolSearchInput" type="text" placeholder="Search Products..." class="pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            </div>
+                            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg shadow-green-600/20 transition-all">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>Add New Product</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table id="schoolsTable" class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                                        <th class="px-6 py-4 font-semibold">Product Name</th>
+                                        <th class="px-6 py-4 font-semibold">Category</th>
+                                        <th class="px-6 py-4 font-semibold">Recipient</th>
+                                        <th class="px-6 py-4 font-semibold">Price</th>
+                                        <th class="px-6 py-4 font-semibold">Stock</th>
+                                        <th class="px-6 py-4 font-semibold text-right">Status</th>
+                                        <th class="px-6 py-4 font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm divide-y divide-gray-50">
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3 font-medium text-gray-700">Official ID Lace</td>
+                                        <td class="px-6 py-3 text-gray-600">ID Items</td>
+                                        <td class="px-6 py-3 text-gray-600">Main School</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱150.00</td>
+                                        <td class="px-6 py-3 text-gray-600">120</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-500 whitespace-nowrap">Available</span>
+                                        </td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <button class="text-blue-500 hover:text-blue-700 transition-colors"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                                <button class="text-red-500 hover:text-red-700 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3 font-medium text-gray-700">Official ID Pin</td>
+                                        <td class="px-6 py-3 text-gray-600">ID Items</td>
+                                        <td class="px-6 py-3 text-gray-600">Main School</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱50.00</td>
+                                        <td class="px-6 py-3 text-gray-600">250</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-500 whitespace-nowrap">Available</span>
+                                        </td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <button class="text-blue-500 hover:text-blue-700 transition-colors"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                                <button class="text-red-500 hover:text-red-700 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3 font-medium text-gray-700">CS Department T-Shirt</td>
+                                        <td class="px-6 py-3 text-gray-600">Uniforms</td>
+                                        <td class="px-6 py-3 text-gray-600">CS Department</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱300.00</td>
+                                        <td class="px-6 py-3 text-gray-600">15</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-warning/20 text-warning whitespace-nowrap">Low Stock</span>
+                                        </td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <button class="text-blue-500 hover:text-blue-700 transition-colors"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                                <button class="text-red-500 hover:text-red-700 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3 font-medium text-gray-700">Grade School Booklet</td>
+                                        <td class="px-6 py-3 text-gray-600">Booklets</td>
+                                        <td class="px-6 py-3 text-gray-600">Main School</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱75.00</td>
+                                        <td class="px-6 py-3 text-gray-600">0</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-500 whitespace-nowrap">Out of Stock</span>
+                                        </td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-3">
+                                                <button class="text-blue-500 hover:text-blue-700 transition-colors"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                                <button class="text-red-500 hover:text-red-700 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 6: Pending List Approval -->
+                <div id="view-pendingApprovals" class="view-section">
+                    <div class="flex justify-between items-center mb-6 gap-4"><h2 class="text-2xl font-bold text-gray-700">Pending Approvals</h2></div>
+                    <div class="bg-white rounded-xl shadow-card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table id="approvalsTable" class="w-full text-left border-collapse">
+                                <thead><tr class="bg-gray-50 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100"><th class="px-6 py-4 font-semibold">Image</th><th class="px-6 py-4 font-semibold">Item Name</th><th class="px-6 py-4 font-semibold">Seller</th><th class="px-6 py-4 font-semibold">Category</th><th class="px-6 py-4 font-semibold">Price</th><th class="px-6 py-4 font-semibold">Date Listed</th><th class="px-6 py-4 font-semibold text-right">Actions</th></tr></thead>
+                                <tbody class="text-sm divide-y divide-gray-50">
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3"><div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs font-medium border border-gray-200">Bk</div></td>
+                                        <td class="px-6 py-3 font-medium text-gray-700">Grade 10 Math Textbook</td>
+                                        <td class="px-6 py-3 text-gray-600">Sarah J.</td>
+                                        <td class="px-6 py-3 text-gray-600">Books</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱250.00</td>
+                                        <td class="px-6 py-3 text-gray-500">2025-12-01</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors shadow-sm">Approve</button>
+                                                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors shadow-sm">Reject</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3"><div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs font-medium border border-gray-200">Uni</div></td>
+                                        <td class="px-6 py-3 font-medium text-gray-700">PE Uniform Set (Size M)</td>
+                                        <td class="px-6 py-3 text-gray-600">Mark B.</td>
+                                        <td class="px-6 py-3 text-gray-600">Uniforms</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱300.00</td>
+                                        <td class="px-6 py-3 text-gray-500">2025-11-28</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors shadow-sm">Approve</button>
+                                                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors shadow-sm">Reject</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-row-hover transition-colors">
+                                        <td class="px-6 py-3"><div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs font-medium border border-gray-200">Cal</div></td>
+                                        <td class="px-6 py-3 font-medium text-gray-700">Scientific Calculator</td>
+                                        <td class="px-6 py-3 text-gray-600">David L.</td>
+                                        <td class="px-6 py-3 text-gray-600">Supplies</td>
+                                        <td class="px-6 py-3 font-bold text-gray-700">₱500.00</td>
+                                        <td class="px-6 py-3 text-gray-500">2025-11-25</td>
+                                        <td class="px-6 py-3 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors shadow-sm">Approve</button>
+                                                <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors shadow-sm">Reject</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 7: Inbox -->
+                <div id="view-inbox" class="view-section">
+                    <div class="grid grid-cols-12 gap-6 h-[calc(100vh-8rem)] min-h-[600px]">
+                        <div class="col-span-12 lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl shadow-card flex flex-col overflow-hidden">
+                            <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+                                <div class="relative">
+                                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" placeholder="Search conversations..." class="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border-none rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none dark:text-white">
+                                </div>
+                            </div>
+                            <div class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
+                                <div class="p-3 rounded-lg bg-primary/5 border-l-4 border-primary cursor-pointer flex gap-3 items-center">
+                                    <div class="relative"><div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">JD</div><span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span></div>
+                                    <div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><h6 class="font-semibold text-sm text-gray-800 dark:text-white truncate">John Doe</h6><span class="text-xs text-gray-500">10:42 AM</span></div><p class="text-xs text-gray-500 dark:text-gray-400 truncate">Is the calculator still available?</p></div>
+                                </div>
+                                <div class="p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex gap-3 items-center transition-colors">
+                                    <div class="relative"><div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold">AS</div></div>
+                                    <div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><h6 class="font-semibold text-sm text-gray-800 dark:text-white truncate">Alice Smith</h6><span class="text-xs text-gray-400">Yesterday</span></div><p class="text-xs text-gray-400 truncate">Thanks for the quick reply!</p></div><span class="w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">2</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-span-12 lg:col-span-8 bg-white dark:bg-gray-800 rounded-xl shadow-card flex flex-col overflow-hidden">
+                            <div class="h-16 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between px-6 bg-white dark:bg-gray-800 z-10">
+                                <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">JD</div><div><h5 class="font-bold text-gray-800 dark:text-white text-sm">John Doe</h5><span class="flex items-center gap-1 text-xs text-green-500"><div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div> Online</span></div></div>
+                                <div class="flex gap-2 text-gray-400"><button class="p-2 hover:bg-gray-50 rounded-full"><i data-lucide="more-vertical" class="w-5 h-5"></i></button></div>
+                            </div>
+                            <div id="chatMessages" class="flex-1 overflow-y-auto custom-scroll p-6 bg-gray-50 dark:bg-[#2b2b2b] flex flex-col gap-4">
+                                <div class="flex justify-center"><span class="text-xs text-gray-400 bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded-full">Today</span></div>
+                                <div class="flex gap-3 max-w-[80%]">
+                                    <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-xs font-bold mt-auto">JD</div>
+                                    <div><div class="chat-received p-3 rounded-2xl rounded-bl-none bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 text-sm">Hello! Is the Scientific Calculator still available?</div><span class="text-[10px] text-gray-400 ml-1 mt-1 block">10:30 AM</span></div>
+                                </div>
+                                <div class="flex gap-3 max-w-[80%] self-end flex-row-reverse">
+                                    <div class="w-8 h-8 rounded-full bg-primary text-white flex-shrink-0 flex items-center justify-center text-xs font-bold mt-auto">You</div>
+                                    <div class="flex flex-col items-end"><div class="chat-sent p-3 rounded-2xl rounded-br-none bg-primary text-white shadow-md text-sm">Yes, it is! It's listed for ₱500.00.</div><span class="text-[10px] text-gray-400 mr-1 mt-1 block">10:32 AM</span></div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+                                <div class="flex gap-2 items-center">
+                                    <button class="p-2 text-gray-400 hover:text-primary rounded-full"><i data-lucide="paperclip" class="w-5 h-5"></i></button>
+                                    <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 bg-gray-50 dark:bg-gray-700 border-none rounded-full px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary outline-none dark:text-white">
+                                    <button onclick="sendMessage()" class="p-2.5 bg-primary hover:bg-primary-hover text-white rounded-full shadow-lg shadow-primary/30 transition-all transform hover:scale-105"><i data-lucide="send" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <script>
+            lucide.createIcons();
+
+            function handleLogin() {
+                const email = document.getElementById('loginEmail').value;
+                const pass = document.getElementById('loginPassword').value;
+                const errorMsg = document.getElementById('loginError');
+                
+                if(email === 'admin@scc.edu.ph' && pass === 'admin123') {
+                    // Success
+                    errorMsg.classList.add('hidden'); // Hide error if visible
+                    
+                    document.getElementById('login-screen').style.opacity = '0';
+                    document.getElementById('login-screen').style.visibility = 'hidden';
+                    
+                    const dashContainer = document.getElementById('dashboard-container');
+                    dashContainer.classList.remove('hidden');
+                    setTimeout(() => {
+                        dashContainer.style.opacity = '1';
+                    }, 100);
+                } else {
+                    // Show Error
+                    errorMsg.classList.remove('hidden');
+                    // Re-initialize icons so the alert icon renders
+                    lucide.createIcons();
+                    
+                    // Shake animation effect
+                    const card = document.querySelector('#login-screen > div');
+                    card.classList.add('animate-pulse');
+                    setTimeout(() => card.classList.remove('animate-pulse'), 200);
+                }
+            }
+            
+            function handleLogout() {
+                document.getElementById('login-screen').style.opacity = '1';
+                document.getElementById('login-screen').style.visibility = 'visible';
+                document.getElementById('dashboard-container').classList.add('hidden');
+                document.getElementById('dashboard-container').style.opacity = '0';
+            }
+
+            function switchView(viewName) {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+                const target = document.getElementById('view-' + viewName);
+                if (target) target.classList.add('active-view');
+
+                document.querySelectorAll('.nav-item').forEach(el => { el.classList.remove('active'); el.classList.remove('text-white'); });
+                const activeNav = document.getElementById('nav-' + viewName);
+                if (activeNav) activeNav.classList.add('active');
+
+                document.querySelectorAll('.sub-item').forEach(el => el.classList.remove('active'));
+                const activeSub = document.getElementById('sub-' + viewName);
+                if (activeSub) activeSub.classList.add('active');
+                
+                lucide.createIcons();
+            }
+
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const body = document.body;
+            sidebarToggle.addEventListener('click', () => { body.classList.toggle('collapsed'); lucide.createIcons(); });
+
+            function setupDropdown(btnId, dropdownId) {
+                const btn = document.getElementById(btnId);
+                const dropdown = document.getElementById(dropdownId);
+                btn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+                document.addEventListener('click', (e) => { if (!dropdown.contains(e.target) && !btn.contains(e.target)) dropdown.classList.remove('show'); });
+            }
+            setupDropdown('notifBtn', 'notifDropdown');
+            setupDropdown('profileBtn', 'profileDropdown');
+
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                document.querySelector('.sun-icon').classList.toggle('hidden');
+                document.querySelector('.moon-icon').classList.toggle('hidden');
+            });
+
+            function filterTable(tableId, searchTerm) {
+                const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+                rows.forEach(row => { row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none'; });
+            }
+
+            const searchConfig = [
+                { input: 'productSearch', tables: ['productsTable', 'usersTable', 'crmTable', 'allItemsTable', 'schoolsTable', 'approvalsTable'] },
+                { input: 'userManagementSearch', tables: ['usersTable', 'crmTable'] },
+                { input: 'allItemsSearchInput', tables: ['allItemsTable'] },
+                { input: 'transactionsSearchInput', tables: ['transactionsTable'] },
+                { input: 'schoolSearchInput', tables: ['schoolsTable'] }
+            ];
+
+            searchConfig.forEach(cfg => {
+                const el = document.getElementById(cfg.input);
+                if(el) {
+                    el.addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        cfg.tables.forEach(tblId => {
+                            const tbl = document.getElementById(tblId);
+                            if(tbl && tbl.offsetParent !== null) filterTable(tblId, term); 
+                        });
+                    });
+                }
+            });
+
+            function switchUserTab(type) {
+                const c = document.getElementById('customersContainer');
+                const s = document.getElementById('sellersContainer');
+                const tc = document.getElementById('tab-customers');
+                const ts = document.getElementById('tab-sellers');
+                const btnText = document.getElementById('addUserBtnText');
+                
+                if (type === 'customers') {
+                    c.classList.remove('hidden'); s.classList.add('hidden');
+                    tc.classList.add('page-tab-active'); tc.classList.remove('page-tab-inactive');
+                    ts.classList.remove('page-tab-active'); ts.classList.add('page-tab-inactive');
+                    btnText.textContent = "Add Customer";
+                } else {
+                    c.classList.add('hidden'); s.classList.remove('hidden');
+                    ts.classList.add('page-tab-active'); ts.classList.remove('page-tab-inactive');
+                    tc.classList.remove('page-tab-active'); tc.classList.add('page-tab-inactive');
+                    btnText.textContent = "Add Seller";
+                }
+            }
+
+            function switchFinanceTab(type) {
+                ['all', 'profit', 'expenses'].forEach(t => {
+                    document.getElementById('fin-' + t + 'Container').classList.add('hidden');
+                    const tab = document.getElementById('tab-fin-' + t);
+                    tab.classList.remove('page-tab-active');
+                    tab.classList.add('page-tab-inactive');
+                });
+                document.getElementById('fin-' + type + 'Container').classList.remove('hidden');
+                const activeTab = document.getElementById('tab-fin-' + type);
+                activeTab.classList.add('page-tab-active');
+                activeTab.classList.remove('page-tab-inactive');
+            }
+
+            const userDropdown = document.getElementById('userDetailsDropdown');
+            let closeTimer = null;
+            function showUserDropdown(row) {
+                if (closeTimer) clearTimeout(closeTimer);
+                const d = row.dataset;
+                document.getElementById('u-name').textContent = d.name;
+                document.getElementById('u-email').textContent = d.email;
+                
+                const rect = row.getBoundingClientRect();
+                let top = rect.bottom + 10;
+                if (top + 300 > window.innerHeight) top = rect.top - 300;
+                
+                userDropdown.style.top = top + 'px';
+                userDropdown.style.left = (rect.left + 20) + 'px';
+                userDropdown.classList.remove('hidden');
+                requestAnimationFrame(() => { userDropdown.style.opacity = '1'; userDropdown.style.transform = 'translateY(0)'; });
+                setTimeout(() => document.addEventListener('click', closeUserDropdownOutside), 100);
+            }
+            function closeUserDropdownOutside(e) {
+                if (!userDropdown.contains(e.target)) {
+                    userDropdown.style.opacity = '0';
+                    userDropdown.style.transform = 'translateY(-10px)';
+                    closeTimer = setTimeout(() => { userDropdown.classList.add('hidden'); document.removeEventListener('click', closeUserDropdownOutside); }, 200);
+                }
+            }
+
+            const inventoryData = [
+                { id: '#35697', name: 'Wireless Mouse', category: 'Electronics', price: '$49.00', sales: '$74,205', stock: 124, status: 'In Stock', img: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100&h=100&fit=crop' },
+                { id: '#35698', name: 'Macbook Charger', category: 'Accessories', price: '$89.00', sales: '$12,500', stock: 45, status: 'In Stock', img: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=100&h=100&fit=crop' },
+                { id: '#35699', name: 'Headphones', category: 'Audio', price: '$299.00', sales: '$8,200', stock: 0, status: 'Out of Stock', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop' },
+                { id: '#35700', name: 'Nike Sneakers', category: 'Fashion', price: '$120.00', sales: '$4,100', stock: 8, status: 'Low Stock', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop' },
+                { id: '#35701', name: 'Camera', category: 'Electronics', price: '$1,649.00', sales: '$74,205', stock: 12, status: 'In Stock', img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=100&h=100&fit=crop' }
+            ];
+
+            function getStatusBadge(status) {
+                const baseClasses = "px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap";
+                if(status === 'In Stock' || status === 'Active' || status === 'Available' || status === 'Verified') return `${baseClasses} bg-green-100 text-green-500`;
+                if(status === 'Out of Stock' || status === 'Rejected' || status === 'Suspended') return `${baseClasses} bg-red-100 text-red-500`;
+                if(status === 'Low Stock' || status === 'Coming Soon' || status === 'Pending') return `${baseClasses} bg-warning/20 text-warning`;
+                if(status === 'Completed' || status === 'Payment Verified') return `${baseClasses} bg-blue-100 text-blue-600`;
+                return `${baseClasses} bg-gray-100 text-gray-500`;
+            }
+
+            function renderDashboardTable() {
+                const tbody = document.querySelector('#productsTable tbody');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+                
+                inventoryData.slice(0, 5).forEach(item => {
+                    const row = `
+                        <tr class="table-row-hover transition-colors">
+                            <td class="px-6 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center p-1 dark:border dark:border-white dark:bg-transparent">
+                                        <img src="${item.img}" class="mix-blend-multiply rounded max-w-full max-h-full">
+                                    </div>
+                                    <div><p class="font-semibold text-gray-600 product-name dark:text-gray-200">${item.name}</p><p class="text-xs text-gray-400">${item.id}</p></div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-3 font-medium text-gray-600 dark:text-gray-300">${item.price}</td>
+                            <td class="px-6 py-3 font-medium text-gray-600 dark:text-gray-300">${item.sales}</td>
+                            <td class="px-6 py-3 text-right">
+                                <span class="${getStatusBadge(item.status)}">${item.status}</span>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            }
+
+            function renderAllItemsTable() {
+                const tbody = document.querySelector('#allItemsTable tbody');
+                if(!tbody) return;
+                tbody.innerHTML = '';
+
+                inventoryData.forEach(item => {
+                    const row = `
+                        <tr class="table-row-hover transition-colors">
+                            <td class="px-6 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center p-1 dark:border dark:border-white dark:bg-transparent">
+                                        <img src="${item.img}" class="mix-blend-multiply rounded max-w-full max-h-full">
+                                    </div>
+                                    <div><p class="font-semibold text-gray-600 product-name dark:text-gray-200">${item.name}</p><p class="text-xs text-gray-400">${item.id}</p></div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-3 text-gray-600 dark:text-gray-400">${item.category}</td>
+                            <td class="px-6 py-3 font-medium text-gray-600 dark:text-gray-300">${item.price}</td>
+                            <td class="px-6 py-3 text-gray-600 dark:text-gray-400">${item.stock}</td>
+                            <td class="px-6 py-3 text-right">
+                                <span class="${getStatusBadge(item.status)}">${item.status}</span>
+                            </td>
+                            <td class="px-6 py-3 text-right">
+                                <button class="text-gray-400 hover:text-primary transition-colors"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            }
+            
+            function sendMessage() {
+                const input = document.getElementById('chatInput');
+                const msgText = input.value.trim();
+                if(!msgText) return;
+
+                const container = document.getElementById('chatMessages');
+                
+                const sentHtml = `
+                    <div class="flex gap-3 max-w-[80%] self-end flex-row-reverse animate-fade-in">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex-shrink-0 flex items-center justify-center text-xs font-bold mt-auto">You</div>
+                        <div class="flex flex-col items-end">
+                            <div class="chat-sent p-3 rounded-2xl rounded-br-none bg-primary text-white shadow-md text-sm">
+                                ${msgText}
+                            </div>
+                            <span class="text-[10px] text-gray-400 mr-1 mt-1 block">Just now</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', sentHtml);
+                input.value = '';
+                container.scrollTop = container.scrollHeight; 
+                
+                setTimeout(() => {
+                    const receivedHtml = `
+                        <div class="flex gap-3 max-w-[80%] animate-fade-in">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-xs font-bold mt-auto">JD</div>
+                            <div>
+                                <div class="chat-received p-3 rounded-2xl rounded-bl-none bg-white dark:bg-gray-700 shadow-sm text-gray-700 dark:text-gray-200 text-sm">
+                                    Sounds good, I'll be there!
+                                </div>
+                                <span class="text-[10px] text-gray-400 ml-1 mt-1 block">Just now</span>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', receivedHtml);
+                    container.scrollTop = container.scrollHeight;
+                }, 1500);
+            }
+            
+            document.getElementById('chatInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                renderDashboardTable();
+                renderAllItemsTable();
+                lucide.createIcons(); 
+            });
+
+        </script>
+    </body>
+</html>
